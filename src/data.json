@@ -1,0 +1,99 @@
+{
+	"locations" : [
+		{
+			"id" : "LDN",
+			"name" : "London",
+			"center" : {
+				"lat" : 51.511214,
+				"lng" : -0.119824
+			}
+		},
+		{
+			"id" : "NYC",
+			"name" : "New York",
+			"center" : {
+				"lat" : 40.714353,
+				"lng" : -74.005973
+			}
+		},
+		{
+			"id" : "KUL",
+			"name" : "Kuala Lumpur",
+			"center" : {
+				"lat" : 3.13192,
+				"lng" : 101.684059
+			}
+		},
+		{
+			"id" : "PVG",
+			"name" : "Shanghai",
+			"center" : {
+				"lat" : 31.230393,
+				"lng" : 121.473704
+			}
+		},
+		{
+			"id" : "NRT",
+			"name" : "Tokyo",
+			"center" : {
+				"lat" : 35.689488,
+				"lng" : 139.691706
+			}
+		}
+	],
+	"trips" : [
+		{
+			"type" : "LIVE",
+			"location" : "LHR",
+			"depart" : "2013-06-02"
+		},
+		{
+			"type" : "VISIT",
+			"location" : "KUL",
+			"depart" : "2013-06-09",
+			"duration" : {
+				"weeks" : 1
+			}
+		},
+		{
+			"type" : "TRANSIT",
+			"location" : "PVG",
+			"depart" : "2013-06-09",
+			"duration" : {
+				"hours" : 6
+			}
+		},
+		{
+			"type" : "LIVE",
+			"location" : "NRT",
+			"depart" : "2013-07-05",
+			"duration" : {
+				"days" : 27
+			}
+		},
+		{
+			"type" : "TRANSIT",
+			"location" : "PVG",
+			"depart" : "2013-07-05",
+			"duration" : {
+				"hours" : 7
+			}
+		},		
+		{
+			"type" : "TRANSIT",
+			"location" : "KUL",
+			"depart" : "2013-07-06",
+			"duration" : {
+				"hours" : 9
+			}
+		},
+		{
+			"type" : "LIVE",
+			"location" : "KUL",
+			"depart" : "2013-07-21",
+			"duration" : {
+				"days" : 15
+			}
+		}
+	]
+}

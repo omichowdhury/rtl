@@ -1,0 +1,22 @@
+{
+  "name": "rtl",
+  "version": "0.0.0",
+  "description": "rtl ===",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omichowdhury/rtl.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/omichowdhury/rtl/issues"
+  },
+  "homepage": "https://github.com/omichowdhury/rtl",
+  "dependencies": {
+    "express": "~4.1.1"
+  }
+}
