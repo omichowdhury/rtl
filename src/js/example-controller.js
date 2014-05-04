@@ -1,4 +1,4 @@
-var app = angular.module("App", ['google-maps']);
+var app = angular.module("App", ['google-maps', 'ui.sortable']);
 
 app.controller("ExampleController", function($scope) {
 
@@ -73,6 +73,12 @@ app.controller("ExampleController", function($scope) {
 
 	}, true);
 
+	$scope.removeMarker = function (index) {
+			console.log($scope.markers);
+			$scope.markers.splice(index, 1);
+			console.log($scope.markers);
+		}
+
 	var onFakeClick = function(mapModel, eventName, originalEventArgs) {
 		if (routingBusy) return;
 		doubleClicked = false;
@@ -91,6 +97,7 @@ app.controller("ExampleController", function($scope) {
 
 		var index = lastIndex + 1;
 
+		
 
 		$scope.$apply(function() {
 			var len = $scope.markers.push({

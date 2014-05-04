@@ -7,6 +7,8 @@
 <!-- Optional theme -->
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 <link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.4.custom.min.css">
+
     <style type="text/css">
       html, body { height: 100%; width: 100%; background-color: #f0f0f0; }
       .angular-google-map-container { height: 800px; }
@@ -16,7 +18,8 @@
       }
     </style>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src='js/libs/jquery-ui-1.10.4.custom.js'></script>
 <script src="//roadtriplab.com:8000/channel/bcsocket.js"></script>
 <script src="//roadtriplab.com:8000/share/share.js"></script>
 <script src="/js/json.js"></script>
@@ -28,6 +31,8 @@
     </script>
 <script src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js'></script>
 <script src='js/libs/angular-google-maps.min.js'></script>
+<script type="text/javascript" src="js/libs/sortable.js"></script>
+
   <script src="js/example-controller.js"></script>
 
         <title> </title>
@@ -48,8 +53,9 @@
       </div>
        <div class="controls col-md-4">
                             <div class="input-prepend">
-                                <ul>
+                                <ul ui-sortable ng-model="markers">
                                   <li ng-repeat="marker in markers"> <h1>{{marker.message}} </h1>
+                                   <button ng-click="removeMarker($index)">Remove</button>
                                     <img src="http://maps.googleapis.com/maps/api/streetview?size=400x150&location={{marker.address.Address}},{{marker.address.Region}}&key=AIzaSyBPmj4gI660Fik3oOkxYzWpEM6CdrBCsNk&sensor=true"/>
                                   <span class="distance">{{marker.distance}}</span> </li>
                                 </ul>
