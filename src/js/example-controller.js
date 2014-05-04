@@ -86,5 +86,29 @@ app.controller("ExampleController", function($scope) {
 	});
 	var lastIndex = 0;
 
+	/*
+	var liveMarkers = [];
+
+	sharejs.open('rtlmarkers', 'json', 'http://roadtriplab.com:8000/channel', function (error, doc) {
+		if (doc.created) {
+			console.log("creating document");
+			doc.set($scope.markers, function() {});
+		} else {
+			console.log("document exists");
+			console.log(doc);
+		}
+		liveMarkers = doc;
+
+		doc.on('remoteop', function(op) {
+			$scope.markers = doc.get();
+		});
+
+	}
+
+	$scope.$watch('markers', function(newValue, oldValue) {
+		if (oldValue == newValue) return;
+		liveMarkers.set(newValue);
+	});
+	*/
 
 });
