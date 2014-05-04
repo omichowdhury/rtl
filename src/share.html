@@ -6,41 +6,49 @@
 <script src="//roadtriplab.com:8000/share/share.js"></script>
 <script src="/js/json.js"></script>
 <script src="//roadtriplab.com:8000/share/ace.js"></script>
-    <script>
+<script>
 var syncObject = {};
-var sjs = {};
-        $(document).ready(function() {
-//            var editor = ace.edit("editor");
+var livedoc = {};
+$(document).ready(function() {
+	syncObject = {
+		pins: [
+			{lat: 20, long: 40, name: 'Istanbul'},
+			{lat: 30, long: 40, name: 'Paris'},
+			{lat: 20, long: 10, name: 'New York'}
+		]
+	};
 
-syncObject = {
-	pins: [
-		{lat: 20, long: 40, name: 'Istanbul'},
-		{lat: 30, long: 40, name: 'Paris'},
-		{lat: 20, long: 10, name: 'New York'}
-	]
-};
-
-            sharejs.open('rtlstate', 'json', 'http://roadtriplab.com:8000/channel', function (error, doc) {
-                //doc.attach_ace(editor);
+	sharejs.open('rtlstate', 'json', 'http://roadtriplab.com:8000/channel', function (error, doc) {
 		console.log(doc);
 		if (doc.created) {
-			doc.set(syncObject, function(a,b,c) {
-			});
+			console.log("creating document");
+			doc.set(syncObject, function(a,b,c) {});
+		} else {
+			console.log("document exists");
+			console.log(doc);
 		}
-		sjs = doc;
+		livedoc = doc;
+		syncObject = doc.get();
 
-            });
-        });
-    </script>
-    <style>
-        #editor {
-            width: 200px;
-            height: 100px;
-        }
-    </style>
+		$('#city').val(doc.get().pins[2].name);
+
+		doc.on('remoteop', function(op) {
+			console.log(op);
+			$('#city').val(doc.get().pins[2].name);
+		});
+
+	});
+
+	$('#updateCity').click(function() {
+		livedoc.at('pins').at(2).at('name').set($('#city').val());
+
+	});
+});
+</script>
 </head>
 <body>
-<div id="editor"></div>
+<input id="city" type="text" name="city" />
+<input id="updateCity" type="button" value="Update" />
 </body>
 </html>
 
