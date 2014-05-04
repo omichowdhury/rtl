@@ -220,8 +220,8 @@ app.controller("ExampleController", function($scope) {
 
 			angular.extend($scope, {
 				center: {
-					latitude: 45,
-					longitude: -73
+					latitude: 40.7127,
+					longitude: -74.0059
 				},
 				zoom: 8,
 				markers: [],
