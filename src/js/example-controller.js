@@ -1,6 +1,6 @@
-var app = angular.module("App", ["leaflet-directive"]);
+var app = angular.module("App", ['google-maps']);
 
-app.controller("ExampleController", function($scope, leafletEvents, $log) {
+app.controller("ExampleController", function($scope) {
 
 	var getName = function() {
 		console.log("NOT LOADED");
@@ -16,74 +16,73 @@ app.controller("ExampleController", function($scope, leafletEvents, $log) {
 
 	var service = new google.maps.DistanceMatrixService();
 
-	getDrive = function (orig, dest, callback) {
-		service.getDistanceMatrix(
-		  {
-		    origins: [
-		    	new google.maps.LatLng(orig.lat, orig.lng)
-		    ],
-		    destinations: [
-		    	new google.maps.LatLng(dest.lat, dest.lng)
-		    ],
-		    travelMode: google.maps.TravelMode.DRIVING
-		  }, callback);
+	var getDrive = function(orig, dest, callback) {
+		service.getDistanceMatrix({
+			origins: [
+				new google.maps.LatLng(orig.lat, orig.lng)
+			],
+			destinations: [
+				new google.maps.LatLng(dest.lat, dest.lng)
+			],
+			travelMode: google.maps.TravelMode.DRIVING
+		}, callback);
 	}
 
-	angular.extend($scope, {
-		tiles: {
-			tileLayer: "http://a.tiles.mapbox.com/v3/examples.map-0l53fhk2.json"
-		},
-		center: {
-			lat: 40.095,
-			lng: -3.823,
-			zoom: 10
-		},
-		markers: [],
-		events: {
-			map: {
-				enable: ['zoomstart', 'drag', 'click', 'mousemove'],
-				logic: 'emit'
+	var onMapClick = function(mapModel, eventName, originalEventArgs) {
+		var e = originalEventArgs[0];
+
+		var lat = e.latLng.lat();
+		var lng = e.latLng.lng();
+
+		var index = lastIndex + 1;
+
+
+		$scope.$apply(function() {
+			var len = $scope.markers.push({
+				latitude: lat,
+				longitude: lng,
+				message: "Locating",
+				distance: "Routing"
+			});
+
+			var id = len - 1;
+
+			getName(lat, lng, function(evt) {
+				$scope.markers[id].message = evt.address.City;
+			}, function(evt) {
+				$scope.markers[id].message = "Could not locate";
+			});
+
+			if (id > 0) {
+				getDrive($scope.markers[id], $scope.markers[id - 1], function(evt) {
+					console.log(evt)
+					var distance = evt.rows[0]["elements"][0]["duration"]["text"];
+					console.log(distance);
+					$scope.markers[id].distance = distance;
+
+				})
 			}
+		});
+
+
+		console.log(lat, lng);
+
+	}
+	angular.extend($scope, {
+		center: {
+			latitude: 45,
+			longitude: -73
+		},
+		zoom: 8,
+		markers: [{
+			latitude: 44.75842512584765,
+			longitude: -71.31773341738153
+		}],
+		events: {
+			click: onMapClick
 		}
 	});
 	var lastIndex = 0;
 
-	$scope.eventDetected = "No events yet...";
 
-	$scope.$on('leafletDirectiveMap.click', function(event, leafletEvent) {
-		console.log("CLICL", leafletEvent);
-		$scope.eventDetected = "Click";
-		var lat = leafletEvent.leafletEvent.latlng.lat;
-		var lng = leafletEvent.leafletEvent.latlng.lng;
-		var index = lastIndex + 1;
-
-		var len = $scope.markers.push({
-			lat: lat,
-			lng: lng,
-			message: "Locating...",
-			message: "Routing...",
-			focus: true,
-			draggable: true
-		});
-
-		var id = len - 1;
-
-		getName(lat, lng, function(evt) {
-			$scope.markers[id].message = evt.address.City;
-		}, function(evt) {
-			$scope.markers[id].message = "Could not locate";
-		});
-
-		if(id > 0) {
-			getDrive($scope.markers[id],$scope.markers[id-1], function (evt) {
-				console.log(evt)
-				var distance = evt.rows[0]["elements"][0]["duration"]["text"];
-				console.log(distance);
-				$scope.markers[id].distance = distance;
-			
-			})
-		}
-
-
-	});
 });

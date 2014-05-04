@@ -4,17 +4,9 @@
         <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css"/>
     <style type="text/css">
       html, body { height: 100%; width: 100%; }
-      .angular-leaflet-map { height: 100%; width: 100%; }
+      .angular-google-map-container { height: 400px; }
       .controls { position: absolute; top: 100px; left: 100px; }
     </style>
-
-  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6/leaflet.css" />
-  <link href='http://api.tiles.mapbox.com/mapbox.js/v1.1.0/mapbox.standalone.css' rel='stylesheet' />
-  <!--[if lte IE 8]>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6/leaflet.ie.css" />
-  <![endif]-->
-  <script src="js/libs/leaflet-0.6.2.js"></script>
-  <script src='js/libs/mapbox.standalone.uncompressed-1.2.0.js'></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="js/libs/angular-leaflet-directive.js"></script>
@@ -22,7 +14,8 @@
   <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPmj4gI660Fik3oOkxYzWpEM6CdrBCsNk&sensor=true">
     </script>
-
+<script src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js'></script>
+<script src='js/libs/angular-google-maps.min.js'></script>
   <script src="js/example-controller.js"></script>
 
         <title> </title>
@@ -33,7 +26,12 @@
     
   
 
-  <leaflet center="center" testing="testing" tiles="tiles" markers="markers" event-broadcast="events"></leaflet>
+  <!--leaflet center="center" testing="testing" tiles="tiles" markers="markers" event-broadcast="events"></leaflet--> 
+<div class="google-map" center="center" zoom="zoom" draggable="true" events="events">
+  <markers models="markers"
+    coords="'self'">
+</markers>
+</div>
 
 
    <div class="controls">
