@@ -183,4 +183,9 @@ app.controller("ExampleController", function($scope) {
 		liveMarkers.set(newValue);
 	}, true);
 
+	$('.angular-google-map-container').height(window.innerHeight);
+	window.onresize = function() {
+		$('.angular-google-map-container').height(window.innerHeight);
+	}
+
 });
