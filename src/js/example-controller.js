@@ -23,7 +23,9 @@ app.controller("ExampleController", function($scope) {
 
 	var directionsService = new google.maps.DirectionsService();
 
-	var routingBusy = false;
+	var routingBusy = [];
+	var directionsPageSize = 7;
+	var directionsRendererCount = 3;
 
 	var getDrive = function(orig, dest, callback) {
 		distanceService.getDistanceMatrix({
@@ -37,37 +39,72 @@ app.controller("ExampleController", function($scope) {
 		}, callback);
 	}
 
-	var directionsDisplay = new google.maps.DirectionsRenderer({preserveViewport: true, suppressMarkers: true});
+	var directionsDisplays = new Array();
+	var directionsColors = ['#0000FF', '#00FF00', '#FFFF00', '#FF0000'];
+	for (var i = 0; i < directionsRendererCount; i++) {
+		var directionsDisplay = new google.maps.DirectionsRenderer({preserveViewport: true, suppressMarkers: true, polylineOptions:{strokeColor: directionsColors[i]}});
+		directionsDisplays.push(directionsDisplay);
+	}
 
 	$scope.$watch("markers", function(newValue, oldValue) {
 		console.log("WAIT");
 
+		for (d in directionsDisplays) {
+			directionsDisplays[d].setMap(null);
+		}
+
+
 		if (newValue.length > 1) {
-			var orig = newValue[0];
-			var dest = newValue[newValue.length - 1];
+
+		var numPages = Math.ceil((newValue.length - 1) / (directionsPageSize - 1));
+		for (var j = 0; j < numPages; j++) {
+			var origidx = j * (directionsPageSize - 1);
+			var orig = newValue[origidx];
+			var destidx = (j < numPages - 1) ? (j + 1) * (directionsPageSize - 1) : newValue.length - 1;
+				//(j < numPages - 1) ? ((j+1) * directionsPageSize) - 1 : newValue.length - 1;
+			var dest = newValue[destidx];
+
+
+console.log("origidx", origidx, "destidx", destidx);
+			//var orig = newValue[0];
+			//var dest = newValue[newValue.length - 1];
 
 			var request = {
 				origin: new google.maps.LatLng(orig.latitude, orig.longitude),
 				destination: new google.maps.LatLng(dest.latitude, dest.longitude),
 				travelMode: google.maps.TravelMode.DRIVING
 			};
-			if(newValue.length > 2) {
-				var waypoints = [];
-				for (var i = 1; i < newValue.length - 1; i++) {
+			var waypoints = [];
+			if(destidx - origidx > 1 /*newValue.length > 2*/) {
+				for (var i = origidx + 1; i < destidx; i++) {
+console.log("waypoint", i);
 					waypoints.push({
 						location: new google.maps.LatLng(newValue[i]["latitude"], newValue[i]["longitude"])
 					})
 				};
 			}
 			request.waypoints = waypoints;
-			routingBusy = true;
+			routingBusy[j] = true;
 			setTimeout(function() { routingBusy = false; }, 5000);
-			directionsService.route(request, function(result, status) {
-				if (status == google.maps.DirectionsStatus.OK) {
-				routingBusy = false;
-					directionsDisplay.setDirections(result);
-				}
-			});
+			directionsService.route(request, (function(inj) {
+				return function(result, status) {
+					if (status == google.maps.DirectionsStatus.OK) {
+						routingBusy[inj] = false;
+						directionsDisplays[inj].setMap($scope.googleMap);
+						directionsDisplays[inj].setDirections(result);
+					}
+				};
+			})(j));
+
+
+
+
+
+
+		}
+
+
+
 		}
 
 
@@ -80,7 +117,10 @@ app.controller("ExampleController", function($scope) {
 		}
 
 	var onFakeClick = function(mapModel, eventName, originalEventArgs) {
-		if (routingBusy) return;
+		for (r in routingBusy)
+			if (routingBusy[r]) 
+				return;
+
 		doubleClicked = false;
 		window.setTimeout(function() {
 			if (!doubleClicked) {
@@ -153,7 +193,6 @@ app.controller("ExampleController", function($scope) {
 			tilesloaded: function(map) {
 				$scope.$apply(function() {
 					$scope.googleMap = map;
-					directionsDisplay.setMap(map);
 				});
 
 				google.maps.event.addListener(map, 'dblclick', function(event) { 
