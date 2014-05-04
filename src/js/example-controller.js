@@ -30,14 +30,37 @@ app.controller("ExampleController", function($scope) {
 		}, callback);
 	}
 
-	var getDirections = function(orig, dest, callback) {
-		var request = {
-			origin: start,
-			destination: end,
-			travelMode: google.maps.TravelMode.DRIVING
-		};
-		directionsService.route(request, callback);
-	}
+	var directionsDisplay = new google.maps.DirectionsRenderer();
+
+	$scope.$watch("markers", function(newValue, oldValue) {
+		console.log("WAIT");
+
+		if (newValue.length > 1) {
+			var orig = newValue[0];
+			var dest = newValue[newValue.length - 1];
+
+			var request = {
+				origin: new google.maps.LatLng(orig.latitude, orig.longitude),
+				destination: new google.maps.LatLng(dest.latitude, dest.longitude),
+				travelMode: google.maps.TravelMode.DRIVING
+			};
+			if(newValue.length > 2) {
+				var waypoints = [];
+				for (var i = newValue.length - 2; i >= 2; i--) {
+					waypoints.push({
+						location: new google.maps.LatLng(newValue[i]["latitude"], newValue[i]["longitude"])
+					})
+				};
+			}
+			directionsService.route(request, function(result, status) {
+				if (status == google.maps.DirectionsStatus.OK) {
+					directionsDisplay.setDirections(result);
+				}
+			});
+		}
+
+
+	}, true);
 
 	var onMapClick = function(mapModel, eventName, originalEventArgs) {
 		var e = originalEventArgs[0];
@@ -78,10 +101,6 @@ app.controller("ExampleController", function($scope) {
 					});
 				});
 
-				getDirections($scope.markers[id], $scope.markers[id - 1], function(evt) {
-
-				});
-
 			}
 		});
 
@@ -101,6 +120,7 @@ app.controller("ExampleController", function($scope) {
 			tilesloaded: function(map) {
 				$scope.$apply(function() {
 					$scope.googleMap = map;
+					directionsDisplay.setMap(map);
 				});
 			}
 		}
@@ -109,7 +129,7 @@ app.controller("ExampleController", function($scope) {
 
 	var liveMarkers = [];
 
-	sharejs.open('rtlmarkers', 'json', 'http://roadtriplab.com:8000/channel', function (error, doc) {
+	sharejs.open('rtlmarkers', 'json', 'http://roadtriplab.com:8000/channel', function(error, doc) {
 
 		if (doc.created) {
 			console.log("creating document");
