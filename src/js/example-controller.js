@@ -14,10 +14,12 @@ app.controller("ExampleController", function($scope) {
 		}
 	});
 
-	var service = new google.maps.DistanceMatrixService();
+	var distanceService = new google.maps.DistanceMatrixService();
+
+	var directionsService = new google.maps.DirectionsService();
 
 	var getDrive = function(orig, dest, callback) {
-		service.getDistanceMatrix({
+		distanceService.getDistanceMatrix({
 			origins: [
 				new google.maps.LatLng(orig.latitude, orig.longitude)
 			],
@@ -26,6 +28,15 @@ app.controller("ExampleController", function($scope) {
 			],
 			travelMode: google.maps.TravelMode.DRIVING
 		}, callback);
+	}
+
+	var getDirections = function(orig, dest, callback) {
+		var request = {
+			origin: start,
+			destination: end,
+			travelMode: google.maps.TravelMode.DRIVING
+		};
+		directionsService.route(request, callback);
 	}
 
 	var onMapClick = function(mapModel, eventName, originalEventArgs) {
@@ -65,7 +76,12 @@ app.controller("ExampleController", function($scope) {
 					$scope.$apply(function() {
 						$scope.markers[id].distance = distance;
 					});
-				})
+				});
+
+				getDirections($scope.markers[id], $scope.markers[id - 1], function(evt) {
+
+				});
+
 			}
 		});
 
@@ -81,7 +97,12 @@ app.controller("ExampleController", function($scope) {
 		zoom: 8,
 		markers: [],
 		events: {
-			click: onMapClick
+			click: onMapClick,
+			tilesloaded: function(map) {
+				$scope.$apply(function() {
+					$scope.googleMap = map;
+				});
+			}
 		}
 	});
 	var lastIndex = 0;
