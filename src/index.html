@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="App">
     <head>
-        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css"/>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+
     <style type="text/css">
       html, body { height: 100%; width: 100%; }
-      .angular-google-map-container { height: 400px; }
-      .controls { position: absolute; top: 100px; left: 100px; }
+      .angular-google-map-container { height: 800px; }
+      .container-fluid { padding: 0; }
     </style>
 
 <script src="//roadtriplab.com:8000/channel/bcsocket.js"></script>
@@ -30,14 +35,14 @@
   
 
   <!--leaflet center="center" testing="testing" tiles="tiles" markers="markers" event-broadcast="events"></leaflet--> 
-<div class="google-map" center="center" zoom="zoom" draggable="true" events="events">
-  <markers models="markers"
-    coords="'self'">
-</markers>
-</div>
-
-
-   <div class="controls">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="google-map col-md-8" center="center" zoom="zoom" draggable="true" events="events">
+        <markers models="markers"
+          coords="'self'">
+      </markers>
+      </div>
+       <div class="controls col-md-4">
                             <div class="input-prepend">
                                 <ul>
                                   <li ng-repeat="marker in markers"> {{marker.distance}} to {{marker.message}} </li>
@@ -46,5 +51,11 @@
                             </div>
 
   </div>
+    </div>
+  </div>
+
+
+
+  
     </body>
 </html>
