@@ -107,10 +107,10 @@ app.controller("ExampleController", function($scope) {
 	});
 	var lastIndex = 0;
 
-	/*
 	var liveMarkers = [];
 
 	sharejs.open('rtlmarkers', 'json', 'http://roadtriplab.com:8000/channel', function (error, doc) {
+
 		if (doc.created) {
 			console.log("creating document");
 			doc.set($scope.markers, function() {});
@@ -121,15 +121,20 @@ app.controller("ExampleController", function($scope) {
 		liveMarkers = doc;
 
 		doc.on('remoteop', function(op) {
-			$scope.markers = doc.get();
+			console.log('remoteop detected', op);
+			console.log('updated markers doc', doc);
+			$scope.$apply(function() {
+				$scope.markers = doc.get();
+			});
 		});
 
-	}
-
-	$scope.$watch('markers', function(newValue, oldValue) {
-		if (oldValue == newValue) return;
-		liveMarkers.set(newValue);
 	});
-	*/
+
+	$scope.$watch("markers", function(newValue, oldValue) {
+		console.log('markers watch?');
+		if (oldValue == newValue) return;
+		console.log('markers change detected');
+		liveMarkers.set(newValue);
+	}, true);
 
 });
