@@ -111,12 +111,12 @@ float: none;
     <div class="row">
       <div class="google-map col-md-8" center="center" zoom="zoom" draggable="true" events="events">
         <markers models="markers"
-          coords="'self'">
+          coords="'self'" options="markerOptions">
       </markers>
       </div>
        <div class="controls col-md-4">
         <img src="images/logo.svg" alt="Road Trip Lab" class="logo"/>
-                                <ul ui-sortable ng-model="markers">
+                                <ul ui-sortable="sortableOptions" ng-model="markers">
                                   <li ng-repeat="marker in markers" ng-style="getBg($index)"> <div class="header">
                                
                                     <h1>{{marker.message}} </h1>

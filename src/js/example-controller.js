@@ -2,97 +2,124 @@ var app = angular.module("App", ['google-maps', 'ui.sortable']);
 
 app.controller("ExampleController", function($scope) {
 
-		if (!window.location.hash) {
-			var newhash = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
-			window.location = '/#' + newhash;
+	if (!window.location.hash) {
+		var newhash = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
+		window.location = '/#' + newhash;
+	}
+
+	var getName = function() {
+		console.log("NOT LOADED");
+	}
+
+	require(["esri/tasks/locator", "esri/geometry/Point"], function(Locator, Point) {
+		var locator = new Locator("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
+
+		getName = function(lat, lng, callback, err) {
+			locator.locationToAddress(new Point(lng, lat), 5000, callback, err);
 		}
+	});
 
-		var getName = function() {
-			console.log("NOT LOADED");
-		}
+	var distanceService = new google.maps.DistanceMatrixService();
 
-		require(["esri/tasks/locator", "esri/geometry/Point"], function(Locator, Point) {
-			var locator = new Locator("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
+	var directionsService = new google.maps.DirectionsService();
 
-			getName = function(lat, lng, callback, err) {
-				locator.locationToAddress(new Point(lng, lat), 5000, callback, err);
-			}
-		});
+	var routingBusy = false;
 
-		var distanceService = new google.maps.DistanceMatrixService();
+	var getDrive = function(orig, dest, callback) {
+		distanceService.getDistanceMatrix({
+			origins: [
+				new google.maps.LatLng(orig.latitude, orig.longitude)
+			],
+			destinations: [
+				new google.maps.LatLng(dest.latitude, dest.longitude)
+			],
+			travelMode: google.maps.TravelMode.DRIVING
+		}, callback);
+	}
 
-		var directionsService = new google.maps.DirectionsService();
+	var directionsDisplay = new google.maps.DirectionsRenderer({
+		preserveViewport: true,
+		suppressMarkers: true
+	});
 
-		var routingBusy = false;
+	$scope.$watch("markers", function(newValue, oldValue) {
+		console.log("WAIT");
 
-		var getDrive = function(orig, dest, callback) {
-			distanceService.getDistanceMatrix({
-				origins: [
-					new google.maps.LatLng(orig.latitude, orig.longitude)
-				],
-				destinations: [
-					new google.maps.LatLng(dest.latitude, dest.longitude)
-				],
+		if (newValue.length > 1) {
+			var orig = newValue[0];
+			var dest = newValue[newValue.length - 1];
+
+			var request = {
+				origin: new google.maps.LatLng(orig.latitude, orig.longitude),
+				destination: new google.maps.LatLng(dest.latitude, dest.longitude),
 				travelMode: google.maps.TravelMode.DRIVING
-			}, callback);
-		}
-
-		var directionsDisplay = new google.maps.DirectionsRenderer({
-			preserveViewport: true,
-			suppressMarkers: true
-		});
-
-		$scope.$watch("markers", function(newValue, oldValue) {
-			console.log("WAIT");
-
-			if (newValue.length > 1) {
-				var orig = newValue[0];
-				var dest = newValue[newValue.length - 1];
-
-				var request = {
-					origin: new google.maps.LatLng(orig.latitude, orig.longitude),
-					destination: new google.maps.LatLng(dest.latitude, dest.longitude),
-					travelMode: google.maps.TravelMode.DRIVING
+			};
+			if (newValue.length > 2) {
+				var waypoints = [];
+				for (var i = 1; i < newValue.length - 1; i++) {
+					waypoints.push({
+						location: new google.maps.LatLng(newValue[i]["latitude"], newValue[i]["longitude"])
+					})
 				};
-				if (newValue.length > 2) {
-					var waypoints = [];
-					for (var i = 1; i < newValue.length - 1; i++) {
-						waypoints.push({
-							location: new google.maps.LatLng(newValue[i]["latitude"], newValue[i]["longitude"])
-						})
-					};
-				}
-				request.waypoints = waypoints;
-				routingBusy = true;
-				setTimeout(function() {
+			}
+			request.waypoints = waypoints;
+			routingBusy = true;
+			setTimeout(function() {
+				routingBusy = false;
+			}, 5000);
+			directionsService.route(request, function(result, status) {
+				if (status == google.maps.DirectionsStatus.OK) {
 					routingBusy = false;
-				}, 5000);
-				directionsService.route(request, function(result, status) {
-					if (status == google.maps.DirectionsStatus.OK) {
-						routingBusy = false;
-						directionsDisplay.setDirections(result);
-					}
+					directionsDisplay.setDirections(result);
+				}
+			});
+
+
+			// for (var i = 1; i < newValue.length; i++) {
+			// 	var prev = newValue[i].prev;
+			// 	var newPrev = newValue[i - 1];
+			// 	newValue[i].distance = "Routing";
+			// 	getDrive(newValue[i], newValue[i - 1], function(evt) {
+			// 		var distance = evt.rows[0]["elements"][0]["duration"]["text"];
+			// 		$scope.$apply(function() {
+			// 			if($scope.markers[i]) {
+			// 				$scope.markers[i].distance = distance;
+			// 			}
+
+			// 		});
+			// 	});
+
+			// };
+		}
+
+
+
+	}, true);
+
+	$scope.removeMarker = function(index) {
+		console.log($scope.markers);
+		$scope.markers.splice(index, 1);
+		if ($scope.markers.length > 1) {
+			$scope.markers[index].distance = "Routing";
+			getDrive($scope.markers[index], $scope.markers[index - 1], function(evt) {
+				var distance = evt.rows[0]["elements"][0]["duration"]["text"];
+				$scope.$apply(function() {
+					$scope.markers[index].distance = distance;
 				});
-			}
-
-
-		}, true);
-
-		$scope.removeMarker = function(index) {
-			console.log($scope.markers);
-			$scope.markers.splice(index, 1);
-			console.log($scope.markers);
+			});
 		}
+		console.log($scope.markers);
+	}
 
-		$scope.getBg = function(index) {
-			var marker = $scope.markers[index]
-			return {
-				"background": "linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('http://maps.googleapis.com/maps/api/streetview?size=400x150&location=" + marker.address.Address + ", " + marker.address.Region + "&key=AIzaSyBPmj4gI660Fik3oOkxYzWpEM6CdrBCsNk&sensor=true')",
-				"background-repeat": "no-repeat",
-				"background-size": "cover"
+	$scope.getBg = function(index) {
+		var marker = $scope.markers[index]
+		return {
+			"background": "linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('http://maps.googleapis.com/maps/api/streetview?size=400x150&location=" + marker.address.Address + ", " + marker.address.Region + "&key=AIzaSyBPmj4gI660Fik3oOkxYzWpEM6CdrBCsNk&sensor=true')",
+			"background-repeat": "no-repeat",
+			"background-size": "cover"
 
-			}
 		}
+	}
 
 
 	var onFakeClick = function(mapModel, eventName, originalEventArgs) {
@@ -139,9 +166,7 @@ app.controller("ExampleController", function($scope) {
 			if (id > 0) {
 				$scope.markers[id].distance = "Routing";
 				getDrive($scope.markers[id], $scope.markers[id - 1], function(evt) {
-					console.log(evt)
 					var distance = evt.rows[0]["elements"][0]["duration"]["text"];
-					console.log(distance);
 					$scope.$apply(function() {
 						$scope.markers[id].distance = distance;
 					});
@@ -164,6 +189,7 @@ app.controller("ExampleController", function($scope) {
 		},
 		zoom: 8,
 		markers: [],
+		drives: [],
 		events: {
 			click: onFakeClick,
 			tilesloaded: function(map) {
@@ -177,6 +203,30 @@ app.controller("ExampleController", function($scope) {
 				});
 
 			}
+		},
+		sortableOptions: {
+			update: function(e, ui) {
+
+				if ($scope.markers.length > 0) {
+					$scope.$apply(function() {
+						$scope.markers[0].distance = null;
+					});
+					for (var index = 1; index < $scope.markers.length; index++) {
+						$scope.markers[index].distance = "Routing";
+						(function(i) { 
+							getDrive($scope.markers[i], $scope.markers[i - 1], function(evt) {
+								var distance = evt.rows[0]["elements"][0]["duration"]["text"];
+								$scope.$apply(function() {
+									$scope.markers[i].distance = distance;
+								});
+							})
+						})(index);
+					};
+
+				}
+			}
+		},
+		markerOptions : {
 		}
 	});
 	var lastIndex = 0;
@@ -215,7 +265,8 @@ app.controller("ExampleController", function($scope) {
 		liveMarkers.set(newValue);
 	}, true);
 
-	$('.angular-google-map-container').height(window.innerHeight); window.onresize = function() {
+	$('.angular-google-map-container').height(window.innerHeight);
+	window.onresize = function() {
 		$('.angular-google-map-container').height(window.innerHeight);
 	}
 
