@@ -2,82 +2,98 @@ var app = angular.module("App", ['google-maps', 'ui.sortable']);
 
 app.controller("ExampleController", function($scope) {
 
-	if (!window.location.hash) {
-		var newhash = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
-		window.location = '/#'+newhash;
-	}
-
-	var getName = function() {
-		console.log("NOT LOADED");
-	}
-
-	require(["esri/tasks/locator", "esri/geometry/Point"], function(Locator, Point) {
-		var locator = new Locator("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
-
-		getName = function(lat, lng, callback, err) {
-			locator.locationToAddress(new Point(lng, lat), 5000, callback, err);
+		if (!window.location.hash) {
+			var newhash = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
+			window.location = '/#' + newhash;
 		}
-	});
 
-	var distanceService = new google.maps.DistanceMatrixService();
+		var getName = function() {
+			console.log("NOT LOADED");
+		}
 
-	var directionsService = new google.maps.DirectionsService();
+		require(["esri/tasks/locator", "esri/geometry/Point"], function(Locator, Point) {
+			var locator = new Locator("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
 
-	var routingBusy = false;
-
-	var getDrive = function(orig, dest, callback) {
-		distanceService.getDistanceMatrix({
-			origins: [
-				new google.maps.LatLng(orig.latitude, orig.longitude)
-			],
-			destinations: [
-				new google.maps.LatLng(dest.latitude, dest.longitude)
-			],
-			travelMode: google.maps.TravelMode.DRIVING
-		}, callback);
-	}
-
-	var directionsDisplay = new google.maps.DirectionsRenderer({preserveViewport: true, suppressMarkers: true});
-
-	$scope.$watch("markers", function(newValue, oldValue) {
-		console.log("WAIT");
-
-		if (newValue.length > 1) {
-			var orig = newValue[0];
-			var dest = newValue[newValue.length - 1];
-
-			var request = {
-				origin: new google.maps.LatLng(orig.latitude, orig.longitude),
-				destination: new google.maps.LatLng(dest.latitude, dest.longitude),
-				travelMode: google.maps.TravelMode.DRIVING
-			};
-			if(newValue.length > 2) {
-				var waypoints = [];
-				for (var i = 1; i < newValue.length - 1; i++) {
-					waypoints.push({
-						location: new google.maps.LatLng(newValue[i]["latitude"], newValue[i]["longitude"])
-					})
-				};
+			getName = function(lat, lng, callback, err) {
+				locator.locationToAddress(new Point(lng, lat), 5000, callback, err);
 			}
-			request.waypoints = waypoints;
-			routingBusy = true;
-			setTimeout(function() { routingBusy = false; }, 5000);
-			directionsService.route(request, function(result, status) {
-				if (status == google.maps.DirectionsStatus.OK) {
-				routingBusy = false;
-					directionsDisplay.setDirections(result);
-				}
-			});
+		});
+
+		var distanceService = new google.maps.DistanceMatrixService();
+
+		var directionsService = new google.maps.DirectionsService();
+
+		var routingBusy = false;
+
+		var getDrive = function(orig, dest, callback) {
+			distanceService.getDistanceMatrix({
+				origins: [
+					new google.maps.LatLng(orig.latitude, orig.longitude)
+				],
+				destinations: [
+					new google.maps.LatLng(dest.latitude, dest.longitude)
+				],
+				travelMode: google.maps.TravelMode.DRIVING
+			}, callback);
 		}
 
+		var directionsDisplay = new google.maps.DirectionsRenderer({
+			preserveViewport: true,
+			suppressMarkers: true
+		});
 
-	}, true);
+		$scope.$watch("markers", function(newValue, oldValue) {
+			console.log("WAIT");
 
-	$scope.removeMarker = function (index) {
+			if (newValue.length > 1) {
+				var orig = newValue[0];
+				var dest = newValue[newValue.length - 1];
+
+				var request = {
+					origin: new google.maps.LatLng(orig.latitude, orig.longitude),
+					destination: new google.maps.LatLng(dest.latitude, dest.longitude),
+					travelMode: google.maps.TravelMode.DRIVING
+				};
+				if (newValue.length > 2) {
+					var waypoints = [];
+					for (var i = 1; i < newValue.length - 1; i++) {
+						waypoints.push({
+							location: new google.maps.LatLng(newValue[i]["latitude"], newValue[i]["longitude"])
+						})
+					};
+				}
+				request.waypoints = waypoints;
+				routingBusy = true;
+				setTimeout(function() {
+					routingBusy = false;
+				}, 5000);
+				directionsService.route(request, function(result, status) {
+					if (status == google.maps.DirectionsStatus.OK) {
+						routingBusy = false;
+						directionsDisplay.setDirections(result);
+					}
+				});
+			}
+
+
+		}, true);
+
+		$scope.removeMarker = function(index) {
 			console.log($scope.markers);
 			$scope.markers.splice(index, 1);
 			console.log($scope.markers);
 		}
+
+		$scope.getBg = function(index) {
+			var marker = $scope.markers[index]
+			return {
+				"background": "linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('http://maps.googleapis.com/maps/api/streetview?size=400x150&location=" + marker.address.Address + ", " + marker.address.Region + "&key=AIzaSyBPmj4gI660Fik3oOkxYzWpEM6CdrBCsNk&sensor=true')",
+				"background-repeat": "no-repeat",
+				"background-size": "cover"
+
+			}
+		}
+
 
 	var onFakeClick = function(mapModel, eventName, originalEventArgs) {
 		if (routingBusy) return;
@@ -97,7 +113,7 @@ app.controller("ExampleController", function($scope) {
 
 		var index = lastIndex + 1;
 
-		
+
 
 		$scope.$apply(function() {
 			var len = $scope.markers.push({
@@ -111,7 +127,7 @@ app.controller("ExampleController", function($scope) {
 			getName(lat, lng, function(evt) {
 				$scope.$apply(function() {
 					$scope.markers[id].address = evt.address;
-					
+
 					$scope.markers[id].message = evt.address.City;
 				});
 			}, function(evt) {
@@ -156,7 +172,7 @@ app.controller("ExampleController", function($scope) {
 					directionsDisplay.setMap(map);
 				});
 
-				google.maps.event.addListener(map, 'dblclick', function(event) { 
+				google.maps.event.addListener(map, 'dblclick', function(event) {
 					doubleClicked = true;
 				});
 
@@ -168,7 +184,7 @@ app.controller("ExampleController", function($scope) {
 	var liveMarkers = [];
 
 
-	sharejs.open('rtlmarkers_'+window.location.hash.substr(1), 'json', 'http://roadtriplab.com:8000/channel', function (error, doc) {
+	sharejs.open('rtlmarkers_' + window.location.hash.substr(1), 'json', 'http://roadtriplab.com:8000/channel', function(error, doc) {
 
 		if (doc.created) {
 			console.log("creating document");
@@ -199,8 +215,7 @@ app.controller("ExampleController", function($scope) {
 		liveMarkers.set(newValue);
 	}, true);
 
-	$('.angular-google-map-container').height(window.innerHeight);
-	window.onresize = function() {
+	$('.angular-google-map-container').height(window.innerHeight); window.onresize = function() {
 		$('.angular-google-map-container').height(window.innerHeight);
 	}
 

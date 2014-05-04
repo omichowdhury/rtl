@@ -10,12 +10,52 @@
 <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.4.custom.min.css">
 
     <style type="text/css">
-      html, body { height: 100%; width: 100%; background-color: #f0f0f0; }
+      html, body { height: 100%; width: 100%; background-color: #252525; }
       .angular-google-map-container { height: 800px; }
       .container-fluid { padding: 0; }
       .controls {
         font-family: 'Lato', sans-serif;
       }
+      .col-md-4, .col-md-8 {
+        padding: 0;
+        padding-right: 15px;
+      }
+      .controls ul {
+        padding: 0;
+
+      }
+      .controls ul li {
+        list-style: none;
+        min-height: 150px;
+        margin: 1em 15px 0 0;
+        position: relative;
+        border-radius:15px;
+
+      }
+      .controls img {
+        float: left;
+      }
+      .controls h1 {
+        margin: 0;
+        padding: 0.5em;
+        color: #fff;
+        font-weight: 300;
+      }
+
+      .controls .distance {
+        color: #fff;
+        font-size: 15pt;
+        position: absolute;
+bottom: 0.7em;
+left: 0.8em;
+      }
+
+      .controls .delete {
+        position: absolute;
+        top: 1em;
+        right: 1em;
+      }
+
     </style>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -35,7 +75,7 @@
 
   <script src="js/example-controller.js"></script>
 
-        <title> </title>
+        <title> RoadTrip Lab - Putting real time back into a real good time </title>
     </head>
 
     <body ng-controller="ExampleController">
@@ -52,15 +92,18 @@
       </markers>
       </div>
        <div class="controls col-md-4">
-                            <div class="input-prepend">
                                 <ul ui-sortable ng-model="markers">
-                                  <li ng-repeat="marker in markers"> <h1>{{marker.message}} </h1>
-                                   <button ng-click="removeMarker($index)">Remove</button>
-                                    <img src="http://maps.googleapis.com/maps/api/streetview?size=400x150&location={{marker.address.Address}},{{marker.address.Region}}&key=AIzaSyBPmj4gI660Fik3oOkxYzWpEM6CdrBCsNk&sensor=true"/>
-                                  <span class="distance">{{marker.distance}}</span> </li>
+                                  <li ng-repeat="marker in markers" ng-style="getBg($index)"> <div class="header">
+                               
+                                    <h1>{{marker.message}} </h1>
+                                  </div>                                    
+                                  <span class="distance">{{marker.distance}}<span ng-hide="!marker.distance"> drive</span></span> 
+                                                                 <img class="delete" ng-click="removeMarker($index)" src="images/delete.svg" alt="Remove"/>
+
+</li>
+
                                 </ul>
 
-                            </div>
 
   </div>
     </div>
