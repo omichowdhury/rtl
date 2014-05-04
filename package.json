@@ -17,6 +17,13 @@
   },
   "homepage": "https://github.com/omichowdhury/rtl",
   "dependencies": {
-    "express": "~4.1.1"
+    "express": "~4.1.1",
+    "browserchannel": "1.2.0",
+    "connect": "2.14.5",
+    "express": "4.1.1",
+    "hiredis": "0.1.16",
+    "optimist": "0.6.1",
+    "redis": "0.10.1",
+    "share": "0.6.3"
   }
 }
