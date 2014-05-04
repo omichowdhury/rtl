@@ -42,30 +42,12 @@
 
    <div class="controls">
                             <div class="input-prepend">
-                                <span class="add-on">lat</span>
-                                <input class="input-mini" step="any" type="number"  ng-model="markers.osloMarker.lat" />
-                            </div>
-                            <div class="input-prepend">
-                                <span class="add-on">lon</span>
-                                <input class="input-mini" type="number" step="any" ng-model="markers.osloMarker.lng" />
-                            </div>
-                            <div class="input-prepend">
-                                <span class="add-on">zoom</span>
                                 <ul>
                                   <li ng-repeat="marker in markers"> {{marker.message}}, {{marker.distance}} </li>
                                 </ul>
 
                             </div>
-    <button ng-click="center = {
-          lat: 56.022948079627454,
-          lng: 2.900390625,
-          zoom: 4
-      }">Click 1</button>
-         <button ng-click=" center = {
-          lat: 35.460669951495305,
-          lng: 136.47216796875,
-          zoom: 6
-      }">Click 2</button>
+
   </div>
     </body>
 </html>

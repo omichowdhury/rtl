@@ -19,10 +19,10 @@ app.controller("ExampleController", function($scope) {
 	var getDrive = function(orig, dest, callback) {
 		service.getDistanceMatrix({
 			origins: [
-				new google.maps.LatLng(orig.lat, orig.lng)
+				new google.maps.LatLng(orig.latitude, orig.longitude)
 			],
 			destinations: [
-				new google.maps.LatLng(dest.lat, dest.lng)
+				new google.maps.LatLng(dest.latitude, dest.longitude)
 			],
 			travelMode: google.maps.TravelMode.DRIVING
 		}, callback);
@@ -58,8 +58,9 @@ app.controller("ExampleController", function($scope) {
 					console.log(evt)
 					var distance = evt.rows[0]["elements"][0]["duration"]["text"];
 					console.log(distance);
-					$scope.markers[id].distance = distance;
-
+					$scope.$apply(function() {
+						$scope.markers[id].distance = distance;
+					});
 				})
 			}
 		});
@@ -74,10 +75,7 @@ app.controller("ExampleController", function($scope) {
 			longitude: -73
 		},
 		zoom: 8,
-		markers: [{
-			latitude: 44.75842512584765,
-			longitude: -71.31773341738153
-		}],
+		markers: [],
 		events: {
 			click: onMapClick
 		}
