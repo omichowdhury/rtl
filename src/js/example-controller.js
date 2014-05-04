@@ -42,18 +42,22 @@ app.controller("ExampleController", function($scope) {
 				latitude: lat,
 				longitude: lng,
 				message: "Locating",
-				distance: "Routing"
 			});
 
 			var id = len - 1;
 
 			getName(lat, lng, function(evt) {
-				$scope.markers[id].message = evt.address.City;
+				$scope.$apply(function() {
+					$scope.markers[id].message = evt.address.City;
+				});
 			}, function(evt) {
-				$scope.markers[id].message = "Could not locate";
+				$scope.$apply(function() {
+					$scope.markers[id].message = "Could not locate";
+				})
 			});
 
 			if (id > 0) {
+				$scope.markers[id].distance = "Routing";
 				getDrive($scope.markers[id], $scope.markers[id - 1], function(evt) {
 					console.log(evt)
 					var distance = evt.rows[0]["elements"][0]["duration"]["text"];
