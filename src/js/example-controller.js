@@ -35,7 +35,7 @@ app.controller("ExampleController", function($scope) {
 		}, callback);
 	}
 
-	var directionsDisplay = new google.maps.DirectionsRenderer();
+	var directionsDisplay = new google.maps.DirectionsRenderer({preserveViewport: true});
 
 	$scope.$watch("markers", function(newValue, oldValue) {
 		console.log("WAIT");
@@ -66,6 +66,15 @@ app.controller("ExampleController", function($scope) {
 
 
 	}, true);
+
+	var onFakeClick = function(mapModel, eventName, originalEventArgs) {
+		doubleClicked = false;
+		window.setTimeout(function() {
+			if (!doubleClicked) {
+				onMapClick(mapModel, eventName, originalEventArgs);
+			}
+		}, 250);
+	}
 
 	var onMapClick = function(mapModel, eventName, originalEventArgs) {
 		var e = originalEventArgs[0];
@@ -113,6 +122,9 @@ app.controller("ExampleController", function($scope) {
 		console.log(lat, lng);
 
 	}
+
+	var doubleClicked = false;
+
 	angular.extend($scope, {
 		center: {
 			latitude: 45,
@@ -121,12 +133,17 @@ app.controller("ExampleController", function($scope) {
 		zoom: 8,
 		markers: [],
 		events: {
-			click: onMapClick,
+			click: onFakeClick,
 			tilesloaded: function(map) {
 				$scope.$apply(function() {
 					$scope.googleMap = map;
 					directionsDisplay.setMap(map);
 				});
+
+				google.maps.event.addListener(map, 'dblclick', function(event) { 
+					doubleClicked = true;
+				});
+
 			}
 		}
 	});
