@@ -2,42 +2,42 @@ var app = angular.module("App", ['google-maps', 'ui.sortable']);
 
 app.controller("ExampleController", function($scope) {
 
-	if (!window.location.hash) {
-		var newhash = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
-		window.location = '/#'+newhash;
-	}
-
-	var getName = function() {
-		console.log("NOT LOADED");
-	}
-
-	require(["esri/tasks/locator", "esri/geometry/Point"], function(Locator, Point) {
-		var locator = new Locator("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
-
-		getName = function(lat, lng, callback, err) {
-			locator.locationToAddress(new Point(lng, lat), 5000, callback, err);
+		if (!window.location.hash) {
+			var newhash = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
+			window.location = '/#' + newhash;
 		}
-	});
 
-	var distanceService = new google.maps.DistanceMatrixService();
+		var getName = function() {
+			console.log("NOT LOADED");
+		}
 
-	var directionsService = new google.maps.DirectionsService();
+		require(["esri/tasks/locator", "esri/geometry/Point"], function(Locator, Point) {
+			var locator = new Locator("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
+
+			getName = function(lat, lng, callback, err) {
+				locator.locationToAddress(new Point(lng, lat), 5000, callback, err);
+			}
+		});
+
+		var distanceService = new google.maps.DistanceMatrixService();
+
+		var directionsService = new google.maps.DirectionsService();
 
 	var routingBusy = [];
 	var directionsPageSize = 7;
 	var directionsRendererCount = 3;
 
-	var getDrive = function(orig, dest, callback) {
-		distanceService.getDistanceMatrix({
-			origins: [
-				new google.maps.LatLng(orig.latitude, orig.longitude)
-			],
-			destinations: [
-				new google.maps.LatLng(dest.latitude, dest.longitude)
-			],
-			travelMode: google.maps.TravelMode.DRIVING
-		}, callback);
-	}
+		var getDrive = function(orig, dest, callback) {
+			distanceService.getDistanceMatrix({
+				origins: [
+					new google.maps.LatLng(orig.latitude, orig.longitude)
+				],
+				destinations: [
+					new google.maps.LatLng(dest.latitude, dest.longitude)
+				],
+				travelMode: google.maps.TravelMode.DRIVING
+			}, callback);
+		}
 
 	var directionsDisplays = new Array();
 	var directionsColors = ['#0000FF', '#00FF00', '#FFFF00', '#FF0000'];
@@ -46,8 +46,8 @@ app.controller("ExampleController", function($scope) {
 		directionsDisplays.push(directionsDisplay);
 	}
 
-	$scope.$watch("markers", function(newValue, oldValue) {
-		console.log("WAIT");
+		$scope.$watch("markers", function(newValue, oldValue) {
+			console.log("WAIT");
 
 		for (d in directionsDisplays) {
 			directionsDisplays[d].setMap(null);
@@ -108,13 +108,24 @@ console.log("waypoint", i);
 		}
 
 
-	}, true);
+		}, true);
 
-	$scope.removeMarker = function (index) {
+		$scope.removeMarker = function(index) {
 			console.log($scope.markers);
 			$scope.markers.splice(index, 1);
 			console.log($scope.markers);
 		}
+
+		$scope.getBg = function(index) {
+			var marker = $scope.markers[index]
+			return {
+				"background": "linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('http://maps.googleapis.com/maps/api/streetview?size=400x150&location=" + marker.address.Address + ", " + marker.address.Region + "&key=AIzaSyBPmj4gI660Fik3oOkxYzWpEM6CdrBCsNk&sensor=true')",
+				"background-repeat": "no-repeat",
+				"background-size": "cover"
+
+			}
+		}
+
 
 	var onFakeClick = function(mapModel, eventName, originalEventArgs) {
 		for (r in routingBusy)
@@ -137,7 +148,7 @@ console.log("waypoint", i);
 
 		var index = lastIndex + 1;
 
-		
+
 
 		$scope.$apply(function() {
 			var len = $scope.markers.push({
@@ -151,7 +162,7 @@ console.log("waypoint", i);
 			getName(lat, lng, function(evt) {
 				$scope.$apply(function() {
 					$scope.markers[id].address = evt.address;
-					
+
 					$scope.markers[id].message = evt.address.City;
 				});
 			}, function(evt) {
@@ -195,7 +206,7 @@ console.log("waypoint", i);
 					$scope.googleMap = map;
 				});
 
-				google.maps.event.addListener(map, 'dblclick', function(event) { 
+				google.maps.event.addListener(map, 'dblclick', function(event) {
 					doubleClicked = true;
 				});
 
@@ -207,7 +218,7 @@ console.log("waypoint", i);
 	var liveMarkers = [];
 
 
-	sharejs.open('rtlmarkers_'+window.location.hash.substr(1), 'json', 'http://roadtriplab.com:8000/channel', function (error, doc) {
+	sharejs.open('rtlmarkers_' + window.location.hash.substr(1), 'json', 'http://roadtriplab.com:8000/channel', function(error, doc) {
 
 		if (doc.created) {
 			console.log("creating document");
@@ -238,8 +249,7 @@ console.log("waypoint", i);
 		liveMarkers.set(newValue);
 	}, true);
 
-	$('.angular-google-map-container').height(window.innerHeight);
-	window.onresize = function() {
+	$('.angular-google-map-container').height(window.innerHeight); window.onresize = function() {
 		$('.angular-google-map-container').height(window.innerHeight);
 	}
 
