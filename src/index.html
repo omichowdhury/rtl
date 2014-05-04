@@ -6,11 +6,14 @@
 
 <!-- Optional theme -->
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
-
+<link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
     <style type="text/css">
-      html, body { height: 100%; width: 100%; }
+      html, body { height: 100%; width: 100%; background-color: #f0f0f0; }
       .angular-google-map-container { height: 800px; }
       .container-fluid { padding: 0; }
+      .controls {
+        font-family: 'Lato', sans-serif;
+      }
     </style>
 
 <script src="//roadtriplab.com:8000/channel/bcsocket.js"></script>
@@ -45,7 +48,9 @@
        <div class="controls col-md-4">
                             <div class="input-prepend">
                                 <ul>
-                                  <li ng-repeat="marker in markers"> {{marker.distance}} to {{marker.message}} </li>
+                                  <li ng-repeat="marker in markers"> <h1>{{marker.message}} </h1>
+                                    <img src="http://maps.googleapis.com/maps/api/streetview?size=400x150&location={{marker.address.Address}},{{marker.address.Region}}&key=AIzaSyBPmj4gI660Fik3oOkxYzWpEM6CdrBCsNk&sensor=true"/>
+                                  <span class="distance">{{marker.distance}}</span> </li>
                                 </ul>
 
                             </div>

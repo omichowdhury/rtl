@@ -96,6 +96,8 @@ app.controller("ExampleController", function($scope) {
 
 			getName(lat, lng, function(evt) {
 				$scope.$apply(function() {
+					$scope.markers[id].address = evt.address;
+					
 					$scope.markers[id].message = evt.address.City;
 				});
 			}, function(evt) {
