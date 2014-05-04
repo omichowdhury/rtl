@@ -2,6 +2,11 @@ var app = angular.module("App", ['google-maps']);
 
 app.controller("ExampleController", function($scope) {
 
+	if (!window.location.hash) {
+		var newhash = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
+		window.location = '/#'+newhash;
+	}
+
 	var getName = function() {
 		console.log("NOT LOADED");
 	}
@@ -129,7 +134,8 @@ app.controller("ExampleController", function($scope) {
 
 	var liveMarkers = [];
 
-	sharejs.open('rtlmarkers', 'json', 'http://roadtriplab.com:8000/channel', function(error, doc) {
+
+	sharejs.open('rtlmarkers_'+window.location.hash.substr(1), 'json', 'http://roadtriplab.com:8000/channel', function (error, doc) {
 
 		if (doc.created) {
 			console.log("creating document");
@@ -137,6 +143,9 @@ app.controller("ExampleController", function($scope) {
 		} else {
 			console.log("document exists");
 			console.log(doc);
+			$scope.$apply(function() {
+				$scope.markers = doc.get();
+			});
 		}
 		liveMarkers = doc;
 
